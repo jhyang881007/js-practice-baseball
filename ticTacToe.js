@@ -12,7 +12,8 @@ var 초기화 = function (){
     칸들.forEach(function (줄) {
         줄.forEach(function (칸){
             칸.textContent = "";
-        })
+        });
+
     });
 }
 var 비동기콜백 = function(e) {
