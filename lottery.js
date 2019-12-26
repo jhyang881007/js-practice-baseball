@@ -19,7 +19,7 @@ var 당첨숫자들 = 셔플
 
 console.log('당첨숫자들: ', 당첨숫자들, '보너스: ', 보너스);
 
-var 결과창 = document.getElementById('결과창');
+var 결과창 = document.querySelector('#결과창');
 
 function 공색칠하기(숫자, 결과창) {
     var 공 = document.createElement('div');
@@ -31,6 +31,26 @@ function 공색칠하기(숫자, 결과창) {
     공.style.height = '20px';
     공.style.textAlign = 'center';
     공.style.marginRight = '10px';
+    공.style.fontSize = '12px';
+    var 배경색;
+    switch(true){
+        case (숫자 <= 10):
+            배경색 = 'red';
+            break;
+        case (숫자 <= 20):
+            배경색 = 'orange';
+            break;
+        case (숫자 <= 30):
+            배경색 = 'yellow';
+            break;
+        case (숫자 <= 40):
+            배경색 = 'blue';
+            break;
+        case (숫자 <= 45):
+            배경색 = 'green';
+            break;
+    }
+    공.style.background = 배경색;
     결과창.appendChild(공);
 }
 
@@ -59,7 +79,7 @@ setTimeout(function 비동기콜백함수() {
 }, 6000);// 1000밀리초 = 1초
 
 setTimeout(function 비동기콜백함수() {
-    var 칸 = document.getElementsByClassName('보너스')[0];
+    var 칸 = document.querySelector('.보너스');
     공색칠하기(보너스, 칸);
 }, 7000);// 1000밀리초 = 1초
 
