@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Minesweeper</title>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        td{
+            border: 1px solid black;
+            width: 20px;
+            height: 20px;
+        }
+
+    </style>
+</head>
+<body>
+
+<input id="hor" type="number" placeholder="horizontal" value="10"/>
+<input id="ver" type="number" placeholder="vertical" value="10"/>
+<input id="mine" type="number" placeholder="mine" value="20"/>
+<button id="exec">실행</button>
+<table id="table">
+    <thead>
+    <tr>
+        <td>
+            <span id="timer">0</span>초
+        </td>
+    </tr>
+    <tbody></tbody>
+    </thead>
+</table>
+<script src="minesweeper.js"></script>
+</body>
+</html>
