@@ -39,8 +39,17 @@ document.querySelector('#exec').addEventListener('click', function(){
                 var col = Array.prototype.indexOf.call(parentTr.children, e.currentTarget);
                 var row = Array.prototype.indexOf.call(parentTbody.children, parentTr);
                 console.log(parentTr, parentTbody, e.currentTarget, col, row);
-                e.currentTarget.textContent = '!';
-                dataset[row][col] = '!';
+
+                if(e.currentTarget.textContent === '' || e.currentTarget.textContent === 'X') {
+                    e.currentTarget.textContent = '!';
+                    dataset[row][col] = '!';
+                }else if(e.currentTarget.textContent === '!'){
+                    e.currentTarget.textContent = '?';
+                    dataset[row][col] = '?';
+                }else if(e.currentTarget.textContent === '?'){
+                    e.currentTarget.textContent = '';
+                    dataset[row][col] = '1';
+                }
             });
             tr.appendChild(td);
 
