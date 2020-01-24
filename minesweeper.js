@@ -40,15 +40,17 @@ document.querySelector('#exec').addEventListener('click', function(){
                 var row = Array.prototype.indexOf.call(parentTbody.children, parentTr);
                 console.log(parentTr, parentTbody, e.currentTarget, col, row);
 
+                //right click options for '!', '?', and back to '' or 'X'
                 if(e.currentTarget.textContent === '' || e.currentTarget.textContent === 'X') {
                     e.currentTarget.textContent = '!';
-                    dataset[row][col] = '!';
                 }else if(e.currentTarget.textContent === '!'){
                     e.currentTarget.textContent = '?';
-                    dataset[row][col] = '?';
                 }else if(e.currentTarget.textContent === '?'){
+                    if(dataset[row][col] === 'X'){
+                        e.currentTarget.textContent = 'X';
+                    }else{
                     e.currentTarget.textContent = '';
-                    dataset[row][col] = '1';
+                    }
                 }
             });
             tr.appendChild(td);
