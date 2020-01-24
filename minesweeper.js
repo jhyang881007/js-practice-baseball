@@ -1,6 +1,7 @@
 var tbody = document.querySelector('#table tbody');
 var dataset = [];
 document.querySelector('#exec').addEventListener('click', function(){
+    tbody.innerHTML = ''; // initialization
     var ver = parseInt(document.querySelector('#ver').value);
     var hor = parseInt(document.querySelector('#hor').value);
     var mine = parseInt(document.querySelector('#mine').value);
@@ -38,7 +39,6 @@ document.querySelector('#exec').addEventListener('click', function(){
                 var parentTbody = e.currentTarget.parentNode.parentNode;
                 var col = Array.prototype.indexOf.call(parentTr.children, e.currentTarget);
                 var row = Array.prototype.indexOf.call(parentTbody.children, parentTr);
-                console.log(parentTr, parentTbody, e.currentTarget, col, row);
 
                 //right click options for '!', '?', and back to '' or 'X'
                 if(e.currentTarget.textContent === '' || e.currentTarget.textContent === 'X') {
@@ -51,6 +51,26 @@ document.querySelector('#exec').addEventListener('click', function(){
                     }else{
                     e.currentTarget.textContent = '';
                     }
+                }
+            });
+            td.addEventListener('click', function(e){
+                var parentTr = e.currentTarget.parentNode;
+                var parentTbody = e.currentTarget.parentNode.parentNode;
+                var col = Array.prototype.indexOf.call(parentTr.children, e.currentTarget);
+                var row = Array.prototype.indexOf.call(parentTbody.children, parentTr);
+
+                if (dataset[row][col] === 'X'){
+                    e.currentTarget.textContent = 'BOOM!';
+                } else {
+                    var arrayCountX = [] = [
+                        dataset[row-1][col-1], dataset[row-1][col],dataset[row-1][col+1],
+                        dataset[row][col-1],                     dataset[row][col+1],
+                        dataset[row+1][col-1],dataset[row+1][col],dataset[row+1][col+1]
+                        ];
+                    e.currentTarget.textContent = arrayCountX.filter(function(v){
+                            return v === 'X';
+                    }).length;
+
                 }
             });
             tr.appendChild(td);
@@ -79,10 +99,10 @@ document.querySelector('#exec').addEventListener('click', function(){
             horizontal = horizontalTemp - 1;
         }
 
-        console.log(vertical, horizontal);
+
         tbody.children[vertical].children[horizontal].textContent = 'X';
         dataset[vertical][horizontal] = 'X';
     }
-    console.log(dataset);
+
 });
 
