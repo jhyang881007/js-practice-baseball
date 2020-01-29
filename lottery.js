@@ -54,29 +54,19 @@ function 공색칠하기(숫자, 결과창) {
     결과창.appendChild(공);
 }
 
-setTimeout(function 비동기콜백함수() {
-    공색칠하기(당첨숫자들[0], 결과창);
-}, 1000);// 1000밀리초 = 1초
-
-setTimeout(function 비동기콜백함수() {
-    공색칠하기(당첨숫자들[1], 결과창);
-}, 2000);// 1000밀리초 = 1초
-
-setTimeout(function 비동기콜백함수() {
-    공색칠하기(당첨숫자들[2], 결과창);
-}, 3000);// 1000밀리초 = 1초
-
-setTimeout(function 비동기콜백함수() {
-    공색칠하기(당첨숫자들[3], 결과창);
-}, 4000);// 1000밀리초 = 1초
-
-setTimeout(function 비동기콜백함수() {
-    공색칠하기(당첨숫자들[4], 결과창);
-}, 5000);// 1000밀리초 = 1초
-
-setTimeout(function 비동기콜백함수() {
-    공색칠하기(당첨숫자들[5], 결과창);
-}, 6000);// 1000밀리초 = 1초
+// for(var i = 0; i < 당첨숫자들.length; i++){
+//     function 클로저(j){
+//         setTimeout(function (){
+//             공색칠하기(당첨숫자들[j], 결과창);
+//         }, (j + 1) * 1000);
+//     }
+//     클로저(i);
+// }
+for(let i = 0; i < 당첨숫자들.length; i++){
+    setTimeout(function(){
+        공색칠하기(당첨숫자들[i], 결과창);
+    }, (i + 1) * 1000);
+}
 
 setTimeout(function 비동기콜백함수() {
     var 칸 = document.querySelector('.보너스');

@@ -62,15 +62,19 @@ document.querySelector('#exec').addEventListener('click', function(){
                 if (dataset[row][col] === 'X'){
                     e.currentTarget.textContent = 'BOOM!';
                 } else {
-                    var arrayCountX = [] = [
-                        dataset[row-1][col-1], dataset[row-1][col],dataset[row-1][col+1],
-                        dataset[row][col-1],                     dataset[row][col+1],
-                        dataset[row+1][col-1],dataset[row+1][col],dataset[row+1][col+1]
-                        ];
+                    var arrayCountX = [dataset[row][col-1],dataset[row][col+1]];
+
+                    if(dataset[row-1]) {
+                        // arrayCountX = arrayCountX.concat(dataset[row-1][col-1], dataset[row-1][col],dataset[row-1][col+1]);
+                        arrayCountX.push(dataset[row-1][col-1], dataset[row-1][col],dataset[row-1][col+1]);
+                    }
+                    if(dataset[row+1]){
+                        // arrayCountX = arrayCountX.concat(dataset[row+1][col-1],dataset[row+1][col],dataset[row+1][col+1]);
+                        arrayCountX.push(dataset[row+1][col-1],dataset[row+1][col],dataset[row+1][col+1]);
+                    }
                     e.currentTarget.textContent = arrayCountX.filter(function(v){
                             return v === 'X';
                     }).length;
-
                 }
             });
             tr.appendChild(td);
