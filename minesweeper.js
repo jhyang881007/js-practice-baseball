@@ -8,7 +8,7 @@ document.querySelector('#exec').addEventListener('click', function(){
     dataset = [];
     document.querySelector('#result').textContent = '';
     flag= false;
-    opentd = 0;
+    openTd = 0;
     var ver = parseInt(document.querySelector('#ver').value);
     var hor = parseInt(document.querySelector('#hor').value);
     var mine = parseInt(document.querySelector('#mine').value);
@@ -71,8 +71,11 @@ document.querySelector('#exec').addEventListener('click', function(){
                 var parentTbody = e.currentTarget.parentNode.parentNode;
                 var col = Array.prototype.indexOf.call(parentTr.children, e.currentTarget);
                 var row = Array.prototype.indexOf.call(parentTbody.children, parentTr);
+
+
                 e.currentTarget.classList.add('opened');
-                openTd += 1;
+                if(dataset[row][col] === 0){
+                openTd += 1;}
                 //if user click 'X' then game over
                 if (dataset[row][col] === 'X'){
                     e.currentTarget.textContent = 'BOOM!';
@@ -100,18 +103,19 @@ document.querySelector('#exec').addEventListener('click', function(){
                      any mines then open the 8 near tds of the current position */
                     e.currentTarget.textContent = nearMineNumbers || ''; //clears the following values: false, '', 0, null, undefined, NaN
                     if (nearMineNumbers === 0){
-                        var nearCol = [tbody.children[row].children[col-1], tbody.children[row][col+1]];
+                        var nearCol = ([tbody.children[row].children[col-1], tbody.children[row].children[col+1]]);
                         if(tbody.children[row-1]){
-                            nearCol = nearCol.concat(tbody.children[row-1].children[col - 1],
+                            nearCol = nearCol.concat([tbody.children[row-1].children[col - 1],
                                 tbody.children[row-1].children[col],
-                                tbody.children[row-1].children[col+1]);
+                                tbody.children[row-1].children[col+1]]);
                         }
 
                         if(tbody.children[row+1]){
-                            nearCol = nearCol.concat(tbody.children[row+1].children[col - 1],
+                            nearCol = nearCol.concat([tbody.children[row+1].children[col - 1],
                                 tbody.children[row+1].children[col],
-                                tbody.children[row+1].children[col+1]);
+                                tbody.children[row+1].children[col+1]]);
                         }
+                        console.log(nearCol);
                         nearCol.filter(function (v){ return !!v}) //remove undefined or null values from array
                             .forEach(function(nearTds){
                             var parentTr = nearTds.parentNode;
@@ -124,6 +128,7 @@ document.querySelector('#exec').addEventListener('click', function(){
                         });
                     }
                 }
+                console.log(openTd);
                 if (openTd === hor * ver - mine) {
                     flag = true;
                     document.querySelector('#result').textContent = 'You Win!';
@@ -154,7 +159,6 @@ document.querySelector('#exec').addEventListener('click', function(){
             vertical = verticalTemp;
             horizontal = horizontalTemp - 1;
         }
-
 
         tbody.children[vertical].children[horizontal].textContent = 'X';
         dataset[vertical][horizontal] = 'X';
