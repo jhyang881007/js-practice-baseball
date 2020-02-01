@@ -2,6 +2,15 @@ var tbody = document.querySelector('#table tbody');
 var dataset = [];
 var flag = false;
 var openTd = 0;
+var codeList = {
+    openedBox: -1,
+    unopenedBox: 0,
+    mine: 1,
+    questionMarkMine: 2,
+    exclamationMarkMine: 3,
+    exclamationBox: 4,
+    questionMarkBox: 5
+}
 document.querySelector('#exec').addEventListener('click', function(){
     // initialization
     tbody.innerHTML = '';
@@ -40,9 +49,9 @@ document.querySelector('#exec').addEventListener('click', function(){
         for(var j=0; j < hor; j++){
             arr.push(0);
             var td = document.createElement('td');
-            td.addEventListener('contextmenu', function (e){
+            td.addEventListener('contextmenu', function (e) {
                 e.preventDefault();
-                if(flag){
+                if (flag) {
                     return;
                 }
                 var parentTr = e.currentTarget.parentNode;
@@ -51,18 +60,34 @@ document.querySelector('#exec').addEventListener('click', function(){
                 var row = Array.prototype.indexOf.call(parentTbody.children, parentTr);
 
                 //right click options for '!', '?', and back to '' or 'X'
-                if(e.currentTarget.textContent === '' || e.currentTarget.textContent === 'X') {
-                    e.currentTarget.textContent = '!';
-                }else if(e.currentTarget.textContent === '!'){
-                    e.currentTarget.textContent = '?';
-                }else if(e.currentTarget.textContent === '?'){
-                    if(dataset[row][col] === 'X'){
+                if (e.currentTarget.textContent === '' || e.currentTarget.textContent === 'X') {
+                    if (e.currentTarget.textContent === 'X') {
+                        e.currentTarget.textContent = '!';
+                        dataset[row][col] = codeList.exclamationMarkMine;
+                    } else {
+                        e.currentTarget.textContent = '!';
+                        dataset[row][col] = codeList.exclamationBox;
+                    }
+                }else if (e.currentTarget.textContent === '!') {
+                    if (dataset[row][col] === codeList.exclamationMarkMine) {
+                        e.currentTarget.textContent = '?';
+                        dataset[row][col] = codeList.questionMarkMine;
+                    } else {
+                        e.currentTarget.textContent = '?';
+                        dataset[row][col] = codeList.questionMarkBox;
+                    }
+                } else if (e.currentTarget.textContent === '?') {
+                    if (dataset[row][col] === codeList.questionMarkMine) {
                         e.currentTarget.textContent = 'X';
-                    }else{
-                    e.currentTarget.textContent = '';
+                        dataset[row][col] = codeList.mine;
+                    } else {
+                        e.currentTarget.textContent = '';
+                        dataset[row][col] = codeList.unopenedBox;
                     }
                 }
+
             });
+
             td.addEventListener('click', function(e){
                 if (flag){
                     return;
@@ -72,18 +97,20 @@ document.querySelector('#exec').addEventListener('click', function(){
                 var col = Array.prototype.indexOf.call(parentTr.children, e.currentTarget);
                 var row = Array.prototype.indexOf.call(parentTbody.children, parentTr);
 
-
+                if([codeList.questionMarkMine, codeList.exclamationMarkMine, codeList.exclamationBox, codeList.questionMarkBox, codeList.openedBox].includes(dataset[row][col])) {
+                    return;
+                }
                 e.currentTarget.classList.add('opened');
-                if(dataset[row][col] === 0){
+                if(dataset[row][col] === codeList.unopenedBox){
                 openTd += 1;}
                 //if user click 'X' then game over
-                if (dataset[row][col] === 'X'){
+                if (dataset[row][col] === codeList.mine){
                     e.currentTarget.textContent = 'BOOM!';
                     document.querySelector('#result').textContent = 'failed..';
                     flag = true;
                 } else {
                     /*count number of mines of near position position of current position*/
-                    dataset[row][col] = 1;
+                    dataset[row][col] = codeList.openedBox;
                     var arrayCountX = [dataset[row][col-1],dataset[row][col+1]];
 
                     if(dataset[row-1]) {
@@ -96,7 +123,7 @@ document.querySelector('#exec').addEventListener('click', function(){
                     }
 
                     var nearMineNumbers = arrayCountX.filter(function (v){
-                        return v === 'X';
+                        return v === codeList.mine;
                     }).length;
 
                     /*if the near td's of current position does not have
@@ -122,7 +149,7 @@ document.querySelector('#exec').addEventListener('click', function(){
                             var parentTbody = nearTds.parentNode.parentNode;
                             var colNear = Array.prototype.indexOf.call(parentTr.children, nearTds);
                             var rowNear = Array.prototype.indexOf.call(parentTbody.children, parentTr);
-                            if (dataset[rowNear][colNear] !== 1) {
+                            if (dataset[rowNear][colNear] !== codeList.openedBox) {
                                 nearTds.click();
                             }
                         });
@@ -161,7 +188,7 @@ document.querySelector('#exec').addEventListener('click', function(){
         }
 
         tbody.children[vertical].children[horizontal].textContent = 'X';
-        dataset[vertical][horizontal] = 'X';
+        dataset[vertical][horizontal] = codeList.mine;
     }
 
 });
