@@ -118,8 +118,6 @@ function countTime() {
                 }
 
             });
-
-
             td.addEventListener('click', function(e){
                 if (flag){
                     return;
@@ -143,6 +141,15 @@ function countTime() {
                 if (dataset[row][col] === codeList.mine){
                     e.currentTarget.textContent = 'BOOM!';
                     document.querySelector('#result').textContent = 'failed..';
+                    for(var i = 0; i < ver; i++){
+                        for(var j = 0; j < hor; j++){
+                            if(dataset[i][j] === codeList.mine){
+                                if(tbody.children[i].children[j].textContent === "") {
+                                    tbody.children[i].children[j].textContent = 'X';
+                                }
+                            }
+                        }
+                    }
                     flag = true;
                     clearInterval(startTimer);
                 } else {
