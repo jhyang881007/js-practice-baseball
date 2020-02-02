@@ -2,6 +2,8 @@ var tbody = document.querySelector('#table tbody');
 var dataset = [];
 var flag = false;
 var openTd = 0;
+var startTimer;
+var counter = '0';
 var codeList = {
     openedBox: -1,
     unopenedBox: 0,
@@ -11,13 +13,31 @@ var codeList = {
     exclamationBox: 4,
     questionMarkBox: 5
 }
-document.querySelector('#exec').addEventListener('click', function(){
+function initialization () {
     // initialization
     tbody.innerHTML = '';
     dataset = [];
     document.querySelector('#result').textContent = '';
     flag= false;
     openTd = 0;
+    document.querySelector('#timer').textContent = '0';
+    counter = '0';
+    clearInterval(startTimer);
+}
+function countTime() {
+    var Timer = document.querySelector('#timer');
+    Timer.textContent = Number(counter);
+    function timeIt(){
+        counter++;
+        Timer.textContent = Number(counter);
+    }
+   startTimer = setInterval(timeIt, 1000);
+
+}
+
+    document.querySelector('#exec').addEventListener('click', function(){
+    initialization();
+    countTime();
     var ver = parseInt(document.querySelector('#ver').value);
     var hor = parseInt(document.querySelector('#hor').value);
     var mine = parseInt(document.querySelector('#mine').value);
@@ -32,7 +52,7 @@ document.querySelector('#exec').addEventListener('click', function(){
 
     //draw mine locations
     var shuffle = [];
-    while(numbers.length > 80){
+    while(numbers.length > (ver * hor) - mine){
         var shuffledNumbers = numbers.splice(Math.floor(Math.random() * numbers.length), 1)[0];
         shuffle.push(shuffledNumbers);
     }
@@ -40,13 +60,12 @@ document.querySelector('#exec').addEventListener('click', function(){
 
     console.log(shuffle);
 
-
     //create mine table
     for (var i= 0; i < ver; i++){
         var arr = [];
         var tr = document.createElement('tr');
         dataset.push(arr);
-        for(var j=0; j < hor; j++){
+        for(var j=0; j < hor; j++) {
             arr.push(0);
             var td = document.createElement('td');
             td.addEventListener('contextmenu', function (e) {
@@ -62,25 +81,37 @@ document.querySelector('#exec').addEventListener('click', function(){
                 //right click options for '!', '?', and back to '' or 'X'
                 if (e.currentTarget.textContent === '' || e.currentTarget.textContent === 'X') {
                     if (e.currentTarget.textContent === 'X') {
+                        e.currentTarget.classList.remove('unOpened');
+                        e.currentTarget.classList.add('exclamation');
                         e.currentTarget.textContent = '!';
                         dataset[row][col] = codeList.exclamationMarkMine;
                     } else {
+                        e.currentTarget.classList.remove('unOpened');
+                        e.currentTarget.classList.add('exclamation');
                         e.currentTarget.textContent = '!';
                         dataset[row][col] = codeList.exclamationBox;
                     }
-                }else if (e.currentTarget.textContent === '!') {
+                } else if (e.currentTarget.textContent === '!') {
                     if (dataset[row][col] === codeList.exclamationMarkMine) {
+                        e.currentTarget.classList.remove('exclamation');
+                        e.currentTarget.classList.add('question');
                         e.currentTarget.textContent = '?';
                         dataset[row][col] = codeList.questionMarkMine;
                     } else {
+                        e.currentTarget.classList.remove('exclamation');
+                        e.currentTarget.classList.add('question');
                         e.currentTarget.textContent = '?';
                         dataset[row][col] = codeList.questionMarkBox;
                     }
                 } else if (e.currentTarget.textContent === '?') {
                     if (dataset[row][col] === codeList.questionMarkMine) {
+                        e.currentTarget.classList.remove('question');
+                        e.currentTarget.classList.add('unOpened');
                         e.currentTarget.textContent = 'X';
                         dataset[row][col] = codeList.mine;
                     } else {
+                        e.currentTarget.classList.remove('question');
+                        e.currentTarget.classList.add('unOpened');
                         e.currentTarget.textContent = '';
                         dataset[row][col] = codeList.unopenedBox;
                     }
@@ -88,18 +119,23 @@ document.querySelector('#exec').addEventListener('click', function(){
 
             });
 
+
             td.addEventListener('click', function(e){
                 if (flag){
                     return;
                 }
+
                 var parentTr = e.currentTarget.parentNode;
                 var parentTbody = e.currentTarget.parentNode.parentNode;
                 var col = Array.prototype.indexOf.call(parentTr.children, e.currentTarget);
                 var row = Array.prototype.indexOf.call(parentTbody.children, parentTr);
 
-                if([codeList.questionMarkMine, codeList.exclamationMarkMine, codeList.exclamationBox, codeList.questionMarkBox, codeList.openedBox].includes(dataset[row][col])) {
+
+                if([codeList.questionMarkMine, codeList.exclamationMarkMine, codeList.exclamationBox, codeList.questionMarkBox,
+                    codeList.openedBox].includes(dataset[row][col])) {
                     return;
                 }
+                e.currentTarget.classList.remove('unOpened');
                 e.currentTarget.classList.add('opened');
                 if(dataset[row][col] === codeList.unopenedBox){
                 openTd += 1;}
@@ -108,6 +144,7 @@ document.querySelector('#exec').addEventListener('click', function(){
                     e.currentTarget.textContent = 'BOOM!';
                     document.querySelector('#result').textContent = 'failed..';
                     flag = true;
+                    clearInterval(startTimer);
                 } else {
                     /*count number of mines of near position position of current position*/
                     dataset[row][col] = codeList.openedBox;
@@ -123,7 +160,7 @@ document.querySelector('#exec').addEventListener('click', function(){
                     }
 
                     var nearMineNumbers = arrayCountX.filter(function (v){
-                        return v === codeList.mine;
+                        return [codeList.mine, codeList.exclamationMarkMine, codeList.questionMarkMine].includes(v);
                     }).length;
 
                     /*if the near td's of current position does not have
@@ -157,6 +194,7 @@ document.querySelector('#exec').addEventListener('click', function(){
                 }
                 console.log(openTd);
                 if (openTd === hor * ver - mine) {
+                    clearInterval(startTimer);
                     flag = true;
                     document.querySelector('#result').textContent = 'You Win!';
                 }
@@ -174,20 +212,17 @@ document.querySelector('#exec').addEventListener('click', function(){
         var verticalTemp;
         var horizontalTemp;
 
-        verticalTemp = Math.floor(shuffle[k] / 10);
-        horizontalTemp = Math.floor(shuffle[k] % 10);
+        verticalTemp = Math.floor(shuffle[k] / ver);
+        horizontalTemp = Math.floor(shuffle[k] % hor);
         if(horizontalTemp === 0){
             vertical = verticalTemp - 1;
-            horizontal = 9;
-        }else if(verticalTemp === -1){
-            vertical = 0;
-            horizontal = horizontalTemp - 1;
+            horizontal = hor - 1;
         }else{
             vertical = verticalTemp;
             horizontal = horizontalTemp - 1;
         }
 
-        tbody.children[vertical].children[horizontal].textContent = 'X';
+        tbody.children[vertical].children[horizontal].textContent = '';
         dataset[vertical][horizontal] = codeList.mine;
     }
 
