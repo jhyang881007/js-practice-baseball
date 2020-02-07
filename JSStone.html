@@ -9,6 +9,9 @@
             vertical-align: top;
             margin-right: 50px;
         }
+        .turn {
+            border: 1px solid black;
+        }
         #opponent{
             vertical-align: bottom;
         }
@@ -16,6 +19,7 @@
             display: inline-block;
             vertical-align: top;
             width: 200px;
+            background: silver;
         }
         #opponent-deck, #opponent-hero, #opponent-cards, #my-deck, #my-hero, #my-cards {
             text-align: center;
@@ -27,6 +31,7 @@
             position: relative;
             border: 1px solid black;
             margin-bottom: 10px;
+            background: white;
         }
         .card-name{
             font-size: 12px;
@@ -64,6 +69,11 @@
         .card-hidden {
             display: none;
         }
+        #turn-btn{
+            float: right;
+            position: relative;
+            top: -23px;
+        }
     </style>
 </head>
 <body>
@@ -74,10 +84,10 @@
 </div>
 <div id="opponent-deck">
     <div>deck</div>
-
 </div>
 <hr/>
-<div id="my">
+<button id ="turn-btn" >Turn Over</button>
+<div id="my" class="turn"  >
     <div id="my-cards" style="height: 150px"></div>
     <div id="my-hero"></div>
     <div>my cost: <span id="my-cost">10</span>/<span>10</span></div>

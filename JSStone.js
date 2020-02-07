@@ -6,6 +6,7 @@ var opponentField = document.getElementById('opponent-cards');
 var myField = document.getElementById('my-cards');
 var myCost = document.getElementById('my-cost');
 var opponentCost = document.getElementById('opponent-cost');
+var turnButton = document.getElementById('turn-btn');
 var opponentDeckData = [];
 var myDeckData = [];
 var opponentHeroData;
@@ -13,6 +14,7 @@ var myHeroData;
 var opponentFieldData = [];
 var myFieldData = [];
 var turn = true;
+
 /* connect screen and actual data */
 function cardDomConnect (data, dom, hero){
     var card = document.querySelector('.card-hidden .card').cloneNode(true);
@@ -27,7 +29,7 @@ function cardDomConnect (data, dom, hero){
     }
     card.addEventListener('click', function(card){
         if(turn) { //if it is my turn
-            if(!data.mine){ // return if click the opponent card
+            if(!data.mine || data.field){ // return if click the opponent card
                 return;
             }
             var currentCost = Number(myCost.textContent);
@@ -45,11 +47,13 @@ function cardDomConnect (data, dom, hero){
             myFieldData.forEach(function(data){
                 cardDomConnect(data, myField);
             });
+            data.field = true;
             myCost.textContent = currentCost - data.cost;
-            turn = false;
+            createMyDeck(1);
+
 
         } else{
-            if(data.mine){ // return if click my cards in opponents turn
+            if(data.mine || data.field){ // return if click my cards in opponents turn
                 return;
             }
             var currentCost = Number(opponentCost.textContent);
@@ -67,8 +71,9 @@ function cardDomConnect (data, dom, hero){
             opponentFieldData.forEach(function(data){
                 cardDomConnect(data, opponentField);
             });
+            data.field = true;
             opponentCost.textContent = currentCost - data.cost;
-            turn =true;
+            createOpponentDeck(1);
         }
     });
     dom.appendChild(card);
@@ -77,6 +82,7 @@ function createOpponentDeck(n) {
     for (var i = 0; i < n; i++){
         opponentDeckData.push(cardFactory());
     }
+    opponentDeck.innerHTML = '';
     opponentDeckData.forEach(function(data){
         cardDomConnect(data, opponentDeck);
     });
@@ -85,6 +91,7 @@ function createMyDeck(n) {
     for (var i = 0; i < n; i++){
        myDeckData.push(cardFactory(false, true));
     }
+    myDeck.innerHTML = '';
     myDeckData.forEach(function(data){
       cardDomConnect(data, myDeck);
     });
@@ -117,6 +124,17 @@ function Card(hero, myCard){
         this.mine = true;
     }
 }
+turnButton.addEventListener('click', function(){
+    turn = !turn;
+    if(turn){
+        myCost.textContent = 10;
+    }else{
+        opponentCost.textContent = 10;
+    }
+    document.getElementById('opponent').classList.toggle('turn');
+    document.getElementById('my').classList.toggle('turn');
+});
+
 
 
 function cardFactory(hero, myCard) {
