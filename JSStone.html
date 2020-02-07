@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>JS Stone</title>
+    <style>
+        #my, #opponent{
+            display: inline-block;
+            vertical-align: top;
+            margin-right: 50px;
+        }
+        #opponent{
+            vertical-align: bottom;
+        }
+        #my-deck,#opponent-deck{
+            display: inline-block;
+            vertical-align: top;
+            width: 200px;
+        }
+        #opponent-deck, #opponent-hero, #opponent-cards, #my-deck, #my-hero, #my-cards {
+            text-align: center;
+        }
+        .card {
+            width: 50px;
+            height: 75px;
+            display: inline-block;
+            position: relative;
+            border: 1px solid black;
+            margin-bottom: 10px;
+        }
+        .card-name{
+            font-size: 12px;
+            text-align: center;
+        }
+        .card-att, .card-hp, .card-cost {
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 15px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            display: inline-block;
+            position: absolute;
+            bottom: 0;
+            border: 1px solid black;
+        }
+        .card-cost{
+            bottom: auto;
+            top: 0;
+            left: 0;
+            background-color: blue;
+            color: white;
+        }
+        .card-att {
+            left: 0;
+            background-color: yellow;
+        }
+        .card-hp {
+            right: 0;
+            background-color: red;
+            color: white;
+        }
+        .card-hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="opponent">
+    <div>opponent cost: <span span id="opponent-cost">10</span>/<span>10</span></div>
+    <div id="opponent-hero"></div>
+    <div id="opponent-cards" style= "height:150px"></div>
+</div>
+<div id="opponent-deck">
+    <div>deck</div>
+
+</div>
+<hr/>
+<div id="my">
+    <div id="my-cards" style="height: 150px"></div>
+    <div id="my-hero"></div>
+    <div>my cost: <span id="my-cost">10</span>/<span>10</span></div>
+</div>
+<div id="my-deck">
+    <div>deck</div>
+</div>
+<div class="card-hidden">
+    <div class="card">
+        <div class="card-cost"></div>
+        <div class="card-att"></div>
+        <div class="card-hp"></div>
+    </div>
+</div>
+<script src="JSStone.js"></script>
+</body>
+</html>
