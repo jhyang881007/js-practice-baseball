@@ -1,20 +1,48 @@
-var opponentHero = document.getElementById('opponent-hero');
-var myHero = document.getElementById('my-hero');
-var opponentDeck = document.getElementById('opponent-deck');
-var myDeck = document.getElementById('my-deck');
-var opponentField = document.getElementById('opponent-cards');
-var myField = document.getElementById('my-cards');
-var myCost = document.getElementById('my-cost');
-var opponentCost = document.getElementById('opponent-cost');
+var opponent = {
+    Hero: document.getElementById('opponent-hero'),
+    Deck:document.getElementById('opponent-deck'),
+    Field: document.getElementById('opponent-cards'),
+    Cost: document.getElementById('opponent-cost'),
+    DeckData: [],
+    FieldData: [],
+    HeroData: [],
+};
+
+var my = {
+    Hero: document.getElementById('my-hero'),
+    Deck:document.getElementById('my-deck'),
+    Field: document.getElementById('my-cards'),
+    Cost: document.getElementById('my-cost'),
+    DeckData: [],
+    FieldData: [],
+    HeroData: [],
+};
+
 var turnButton = document.getElementById('turn-btn');
-var opponentDeckData = [];
-var myDeckData = [];
-var opponentHeroData;
-var myHeroData;
-var opponentFieldData = [];
-var myFieldData = [];
 var turn = true;
 
+function deckToField(data, turn){
+    var object = turn ? my : opponent;
+    var currentCost = Number(object.Cost.textContent);
+    if(currentCost < data.cost) {
+        return 'end';
+    }
+    var idx = object.DeckData.indexOf(data);
+    object.DeckData.splice(idx,1);
+    object.FieldData.push(data);
+    object.Deck.innerHTML = '';
+    object.Field.innerHTML = '';
+    object.DeckData.forEach(function(data){
+        cardDomConnect(data, object.Deck);
+    });
+    object.FieldData.forEach(function(data){
+        cardDomConnect(data, object.Field);
+    });
+    data.field = true;
+    object.Cost.textContent = currentCost - data.cost;
+
+
+}
 /* connect screen and actual data */
 function cardDomConnect (data, dom, hero){
     var card = document.querySelector('.card-hidden .card').cloneNode(true);
@@ -27,82 +55,63 @@ function cardDomConnect (data, dom, hero){
         name.textContent = 'hero';
         card.appendChild(name);
     }
-    card.addEventListener('click', function(card){
+    card.addEventListener('click', function(){
         if(turn) { //if it is my turn
-            if(!data.mine || data.field){ // return if click the opponent card
+            if(!data.mine){ // return if click the opponent card
                 return;
             }
-            var currentCost = Number(myCost.textContent);
-            if(currentCost < data.cost) {
-                return;
+            if(data.field){
+                card.parentNode.querySelectorAll('.card').forEach(function(e){
+                  e.classList.remove('card-selected');
+                });
+                card.classList.add('card-selected');
+            }else{
+                if(deckToField(data, true) !== 'end'){
+                    createMyDeck(1);
+                }
             }
-            var idx = myDeckData.indexOf(data);
-            myDeckData.splice(idx,1);
-            myFieldData.push(data);
-            myDeck.innerHTML = '';
-            myField.innerHTML = '';
-            myDeckData.forEach(function(data){
-                cardDomConnect(data, myDeck);
-            });
-            myFieldData.forEach(function(data){
-                cardDomConnect(data, myField);
-            });
-            data.field = true;
-            myCost.textContent = currentCost - data.cost;
-            createMyDeck(1);
-
-
         } else{
-            if(data.mine || data.field){ // return if click my cards in opponents turn
+            if(data.mine){ // return if click my cards in opponents turn
                 return;
             }
-            var currentCost = Number(opponentCost.textContent);
-            if(currentCost < data.cost) {
-                return;
-            }
-            var idx = opponentDeckData.indexOf(data);
-            opponentDeckData.splice(idx,1);
-            opponentFieldData.push(data);
-            opponentDeck.innerHTML = '';
-            opponentField.innerHTML = '';
-            opponentDeckData.forEach(function(data){
-                cardDomConnect(data, opponentDeck);
-            });
-            opponentFieldData.forEach(function(data){
-                cardDomConnect(data, opponentField);
-            });
-            data.field = true;
-            opponentCost.textContent = currentCost - data.cost;
-            createOpponentDeck(1);
+            if(data.field){
+                card.parentNode.querySelectorAll('.card').forEach(function(e){
+                    e.classList.remove('card-selected');
+                });
+                card.classList.add('card-selected');
+            }else{
+            if(deckToField(data, false) !== 'end'){
+                createOpponentDeck(1);
+            };}
         }
     });
     dom.appendChild(card);
 }
 function createOpponentDeck(n) {
     for (var i = 0; i < n; i++){
-        opponentDeckData.push(cardFactory());
+        opponent.DeckData.push(cardFactory());
     }
-    opponentDeck.innerHTML = '';
-    opponentDeckData.forEach(function(data){
-        cardDomConnect(data, opponentDeck);
+    opponent.Deck.innerHTML = '';
+    opponent.DeckData.forEach(function(data){
+        cardDomConnect(data, opponent.Deck);
     });
 }
 function createMyDeck(n) {
     for (var i = 0; i < n; i++){
-       myDeckData.push(cardFactory(false, true));
+       my.DeckData.push(cardFactory(false, true));
     }
-    myDeck.innerHTML = '';
-    myDeckData.forEach(function(data){
-      cardDomConnect(data, myDeck);
+    my.Deck.innerHTML = '';
+    my.DeckData.forEach(function(data){
+      cardDomConnect(data, my.Deck);
     });
 }
 function createMyHero() {
-    myHeroData = cardFactory(true, true);
-    cardDomConnect(myHeroData, myHero, true);
+    my.HeroData = cardFactory(true, true);
+    cardDomConnect(my.HeroData, my.Hero, true);
 }
 function createOpponentHero() {
-    opponentHeroData = cardFactory(true);
-    cardDomConnect(opponentHeroData, opponentHero, true);
+    opponent.HeroData = cardFactory(true);
+    cardDomConnect(opponent.HeroData, opponent.Hero, true);
 }
 function initialSetting() {
     createOpponentDeck(5);
@@ -127,9 +136,9 @@ function Card(hero, myCard){
 turnButton.addEventListener('click', function(){
     turn = !turn;
     if(turn){
-        myCost.textContent = 10;
+        my.Cost.textContent = 10;
     }else{
-        opponentCost.textContent = 10;
+        opponent.Cost.textContent = 10;
     }
     document.getElementById('opponent').classList.toggle('turn');
     document.getElementById('my').classList.toggle('turn');
