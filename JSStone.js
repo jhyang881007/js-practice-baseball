@@ -6,6 +6,8 @@ var opponent = {
     DeckData: [],
     FieldData: [],
     HeroData: [],
+    selectedCard: null,
+    selectedCardData: null,
 };
 
 var my = {
@@ -16,6 +18,8 @@ var my = {
     DeckData: [],
     FieldData: [],
     HeroData: [],
+    selectedCard: null,
+    selectedCardData: null,
 };
 
 var turnButton = document.getElementById('turn-btn');
@@ -40,8 +44,19 @@ function deckToField(data, turn){
     });
     data.field = true;
     object.Cost.textContent = currentCost - data.cost;
-
-
+}
+function updateDom(myScreen){
+    var object = myScreen ? my : opponent;
+    object.Hero.innerHTML = '';
+    object.Field.innerHTML = '';
+    object.Deck.innerHTML = '';
+    object.FieldData.forEach(function(data){
+        cardDomConnect(data, object.Field);
+    })
+    object.DeckData.forEach(function(data){
+        cardDomConnect(data,object.Deck);
+    })
+    cardDomConnect(object.HeroData, object.Hero, true);
 }
 /* connect screen and actual data */
 function cardDomConnect (data, dom, hero){
@@ -56,22 +71,49 @@ function cardDomConnect (data, dom, hero){
         card.appendChild(name);
     }
     card.addEventListener('click', function(){
+
         if(turn) { //if it is my turn
-            if(!data.mine){ // return if click the opponent card
-                return;
-            }
+            // if(hero && !my.selectedCard){
+            //     return;
+            // }
+            if(!data.mine && my.selectedCard && !my.selectedCard.classList.contains('card-turnover')){
+                    data.hp = data.hp - my.selectedCardData.att;
+                    updateDom(false);
+                    my.selectedCard.classList.remove('card-selected');
+                    my.selectedCard.classList.add('card-turnover');
+                    my.selectedCard = null;
+                    my.selectedCardData = null;
+                    //turnButton.click();
+                    return;
+                }else if(!data.mine){// return if click the opponent card
+                    return;
+                }
             if(data.field){
                 card.parentNode.querySelectorAll('.card').forEach(function(e){
                   e.classList.remove('card-selected');
                 });
                 card.classList.add('card-selected');
+                my.selectedCard = card;
+                my.selectedCardData = data;
             }else{
                 if(deckToField(data, true) !== 'end'){
                     createMyDeck(1);
                 }
             }
         } else{
-            if(data.mine){ // return if click my cards in opponents turn
+            // if(hero && !opponent.selectedCard){
+            //     return;
+            // }
+            if(data.mine && opponent.selectedCard && !opponent.selectedCard.classList.contains('card-turnover')){ // return if click my cards in opponents turn
+                data.hp = data.hp - opponent.selectedCardData.att;
+                updateDom(true);
+                opponent.selectedCard.classList.remove('card-selected');
+                opponent.selectedCard.classList.add('card-turnover');
+                opponent.selectedCard = null;
+                opponent.selectedCardData = null;
+                //turnButton.click();
+                return;
+            }else if(data.mine){// return if click the opponent card
                 return;
             }
             if(data.field){
@@ -79,6 +121,8 @@ function cardDomConnect (data, dom, hero){
                     e.classList.remove('card-selected');
                 });
                 card.classList.add('card-selected');
+                opponent.selectedCard = card;
+                opponent.selectedCardData = data;
             }else{
             if(deckToField(data, false) !== 'end'){
                 createOpponentDeck(1);
@@ -124,6 +168,7 @@ function Card(hero, myCard){
         this.att = Math.ceil(Math.random() * 2);
         this.hp = Math.ceil(Math.random() * 5) + 25;
         this.hero = true;
+        this.field = true;
     }else {
         this.att = Math.ceil(Math.random() * 5);
         this.hp = Math.ceil(Math.random() * 5);
@@ -134,14 +179,23 @@ function Card(hero, myCard){
     }
 }
 turnButton.addEventListener('click', function(){
+    var object = turn ? my : opponent;
+    document.getElementById('opponent').classList.toggle('turn');
+    document.getElementById('my').classList.toggle('turn');
+    object.Hero.innerHTML = '';
+    object.Field.innerHTML = '';
+    object.FieldData.forEach(function(data){
+        cardDomConnect(data, object.Field);
+    });
+    cardDomConnect(object.HeroData, object.Hero, true);
+
     turn = !turn;
     if(turn){
         my.Cost.textContent = 10;
     }else{
         opponent.Cost.textContent = 10;
     }
-    document.getElementById('opponent').classList.toggle('turn');
-    document.getElementById('my').classList.toggle('turn');
+
 });
 
 
