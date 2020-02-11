@@ -9,7 +9,6 @@ var opponent = {
     selectedCard: null,
     selectedCardData: null,
 };
-
 var my = {
     Hero: document.getElementById('my-hero'),
     Deck:document.getElementById('my-deck'),
@@ -21,10 +20,10 @@ var my = {
     selectedCard: null,
     selectedCardData: null,
 };
-
 var turnButton = document.getElementById('turn-btn');
 var turn = true;
 
+/*move card from deck to field*/
 function deckToField(data, turn){
     var object = turn ? my : opponent;
     var currentCost = Number(object.Cost.textContent);
@@ -45,6 +44,8 @@ function deckToField(data, turn){
     data.field = true;
     object.Cost.textContent = currentCost - data.cost;
 }
+
+/*update dom(screen)*/
 function updateDom(myScreen){
     var object = myScreen ? my : opponent;
     object.Hero.innerHTML = '';
@@ -58,6 +59,8 @@ function updateDom(myScreen){
     })
     cardDomConnect(object.HeroData, object.Hero, true);
 }
+
+/*initialization*/
 function reset(myScreen){
     var object = myScreen ? my : opponent;
     object.Hero.innerHTML = '';
@@ -68,6 +71,51 @@ function reset(myScreen){
     object.HeroData = [];
     object.Cost.textContent = 10;
 }
+
+/*card fight between me and opponent*/
+function performAction(data, turn, card, hero){
+    var object = turn ? my : opponent;
+    var figureOutMine = turn? !data.mine : data.mine;
+    var updateScore = turn? opponent : my;
+
+    //attack the card if the clicked card is not mine, have selected Card on my turn and selected card is not turnover card.
+    if(figureOutMine && object.selectedCard && !object.selectedCard.classList.contains('card-turnover')){
+        data.hp = data.hp - object.selectedCardData.att;
+        if(data.hp <= 0){
+            if(hero){//if hero's card hp is less than or equal to 0 then game end
+                turn ? alert('You win!'): alert('You lose..');
+                reset(true);
+                reset(false);
+                initialSetting();
+            }else{//if soldier's card hp is less than or equal to 0 then remove from fieldData.
+                var index = updateScore.FieldData.indexOf(data);
+                updateScore.FieldData.splice(index, 1);
+            }
+        }
+
+        turn ? updateDom(false) : updateDom(true); //update screen
+        object.selectedCard.classList.remove('card-selected');
+        object.selectedCard.classList.add('card-turnover');
+        object.selectedCard = null;
+        object.selectedCardData = null;
+        return;
+    }else if(figureOutMine){// return if click other side try to attack or select cards when its not their turn.
+        return;
+    }
+    if(data.field){
+        card.parentNode.querySelectorAll('.card').forEach(function(e){
+            e.classList.remove('card-selected');
+        });
+        card.classList.add('card-selected');
+        object.selectedCard = card;
+        object.selectedCardData = data;
+    }else{
+        if(deckToField(data,turn) !== 'end'){//refill a card to deck once one card selected and moved to field.
+           turn ? createMyDeck(1): createOpponentDeck(1);
+        }
+    }
+}
+
 /* connect screen and actual data */
 function cardDomConnect (data, dom, hero){
     var card = document.querySelector('.card-hidden .card').cloneNode(true);
@@ -81,80 +129,7 @@ function cardDomConnect (data, dom, hero){
         card.appendChild(name);
     }
     card.addEventListener('click', function(){
-
-        if(turn) {
-            if(!data.mine && my.selectedCard && !my.selectedCard.classList.contains('card-turnover')){
-                data.hp = data.hp - my.selectedCardData.att;
-                if(data.hp <= 0){
-                    if(hero){
-                        alert('You Win!');
-                        reset(true);
-                        reset(false);
-                        initialSetting();
-                    }else{
-                        var index = opponent.FieldData.indexOf(data);
-                        opponent.FieldData.splice(index, 1);
-                    }
-                }
-                updateDom(false);
-                my.selectedCard.classList.remove('card-selected');
-                my.selectedCard.classList.add('card-turnover');
-                my.selectedCard = null;
-                my.selectedCardData = null;
-                //turnButton.click();
-                return;
-            }else if(!data.mine){// return if click the opponent card
-                return;
-            }
-            if(data.field){
-                card.parentNode.querySelectorAll('.card').forEach(function(e){
-                    e.classList.remove('card-selected');
-                });
-                card.classList.add('card-selected');
-                my.selectedCard = card;
-                my.selectedCardData = data;
-            }else{
-                if(deckToField(data, true) !== 'end'){
-                    createMyDeck(1);
-                }
-            }
-        } else{
-
-            if(data.mine && opponent.selectedCard && !opponent.selectedCard.classList.contains('card-turnover')){ // return if click my cards in opponents turn
-                data.hp = data.hp - opponent.selectedCardData.att;
-                if(data.hp <= 0){
-                    if(hero){
-                        alert('You Lose...');
-                        reset(true);
-                        reset(false);
-                        initialSetting();
-                    }else{
-                        var index = my.FieldData.indexOf(data);
-                        my.FieldData.splice(index, 1);
-                    }
-                }
-                updateDom(true);
-                opponent.selectedCard.classList.remove('card-selected');
-                opponent.selectedCard.classList.add('card-turnover');
-                opponent.selectedCard = null;
-                opponent.selectedCardData = null;
-                //turnButton.click();
-                return;
-            }else if(data.mine){// return if click the opponent card
-                return;
-            }
-            if(data.field){
-                card.parentNode.querySelectorAll('.card').forEach(function(e){
-                    e.classList.remove('card-selected');
-                });
-                card.classList.add('card-selected');
-                opponent.selectedCard = card;
-                opponent.selectedCardData = data;
-            }else{
-                if(deckToField(data, false) !== 'end'){
-                    createOpponentDeck(1);
-                };}
-        }
+        performAction(data,turn,card,hero);
     });
     dom.appendChild(card);
 }
@@ -224,7 +199,6 @@ turnButton.addEventListener('click', function(){
     }
 
 });
-
 function cardFactory(hero, myCard) {
     return new Card(hero, myCard);
 }
