@@ -58,6 +58,16 @@ function updateDom(myScreen){
     })
     cardDomConnect(object.HeroData, object.Hero, true);
 }
+function reset(myScreen){
+    var object = myScreen ? my : opponent;
+    object.Hero.innerHTML = '';
+    object.Field.innerHTML = '';
+    object.Deck.innerHTML = '';
+    object.FieldData = [];
+    object.DeckData = [];
+    object.HeroData = [];
+    object.Cost.textContent = 10;
+}
 /* connect screen and actual data */
 function cardDomConnect (data, dom, hero){
     var card = document.querySelector('.card-hidden .card').cloneNode(true);
@@ -72,16 +82,15 @@ function cardDomConnect (data, dom, hero){
     }
     card.addEventListener('click', function(){
 
-        if(turn) { //if it is my turn
-            // if(hero && !my.selectedCard){
-            //     return;
-            // }
-            if(!data.mine && my.selectedCard && !my.selectedCard.classList.contains('card-turnover'){
+        if(turn) {
+            if(!data.mine && my.selectedCard && !my.selectedCard.classList.contains('card-turnover')){
                 data.hp = data.hp - my.selectedCardData.att;
                 if(data.hp <= 0){
                     if(hero){
                         alert('You Win!');
-                        return;
+                        reset(true);
+                        reset(false);
+                        initialSetting();
                     }else{
                         var index = opponent.FieldData.indexOf(data);
                         opponent.FieldData.splice(index, 1);
@@ -109,49 +118,21 @@ function cardDomConnect (data, dom, hero){
                     createMyDeck(1);
                 }
             }
-=======
-                    data.hp = data.hp - my.selectedCardData.att;
-                    updateDom(false);
-                    my.selectedCard.classList.remove('card-selected');
-                    my.selectedCard.classList.add('card-turnover');
-                    my.selectedCard = null;
-                    my.selectedCardData = null;
-                    //turnButton.click();
-                    return;
-                }else if(!data.mine){// return if click the opponent card
-                    return;
-                }
-            if(data.field){
-                card.parentNode.querySelectorAll('.card').forEach(function(e){
-                  e.classList.remove('card-selected');
-                });
-                card.classList.add('card-selected');
-                my.selectedCard = card;
-                my.selectedCardData = data;
-            }else{
-                if(deckToField(data, true) !== 'end'){
-                    createMyDeck(1);
-                }
-            }
->>>>>>> 3970ecfabeedde43087329b4b1a44763e38efec8
         } else{
-            // if(hero && !opponent.selectedCard){
-            //     return;
-            // }
+
             if(data.mine && opponent.selectedCard && !opponent.selectedCard.classList.contains('card-turnover')){ // return if click my cards in opponents turn
                 data.hp = data.hp - opponent.selectedCardData.att;
-<<<<<<< HEAD
                 if(data.hp <= 0){
                     if(hero){
-                        alert('You Lose..');
-                        return;
+                        alert('You Lose...');
+                        reset(true);
+                        reset(false);
+                        initialSetting();
                     }else{
                         var index = my.FieldData.indexOf(data);
                         my.FieldData.splice(index, 1);
                     }
                 }
-=======
->>>>>>> 3970ecfabeedde43087329b4b1a44763e38efec8
                 updateDom(true);
                 opponent.selectedCard.classList.remove('card-selected');
                 opponent.selectedCard.classList.add('card-turnover');
@@ -170,15 +151,9 @@ function cardDomConnect (data, dom, hero){
                 opponent.selectedCard = card;
                 opponent.selectedCardData = data;
             }else{
-<<<<<<< HEAD
                 if(deckToField(data, false) !== 'end'){
                     createOpponentDeck(1);
                 };}
-=======
-            if(deckToField(data, false) !== 'end'){
-                createOpponentDeck(1);
-            };}
->>>>>>> 3970ecfabeedde43087329b4b1a44763e38efec8
         }
     });
     dom.appendChild(card);
@@ -194,19 +169,11 @@ function createOpponentDeck(n) {
 }
 function createMyDeck(n) {
     for (var i = 0; i < n; i++){
-<<<<<<< HEAD
         my.DeckData.push(cardFactory(false, true));
     }
     my.Deck.innerHTML = '';
     my.DeckData.forEach(function(data){
         cardDomConnect(data, my.Deck);
-=======
-       my.DeckData.push(cardFactory(false, true));
-    }
-    my.Deck.innerHTML = '';
-    my.DeckData.forEach(function(data){
-      cardDomConnect(data, my.Deck);
->>>>>>> 3970ecfabeedde43087329b4b1a44763e38efec8
     });
 }
 function createMyHero() {
@@ -258,11 +225,8 @@ turnButton.addEventListener('click', function(){
 
 });
 
-
-
 function cardFactory(hero, myCard) {
     return new Card(hero, myCard);
 }
-
 
 initialSetting();
