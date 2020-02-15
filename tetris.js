@@ -97,42 +97,46 @@ window.addEventListener('keydown', function(e){
     }
 });
 function drawScreen() {
+
     tetrisData.forEach(function (tr, i){
         tr.forEach(function(td, j){
             table.children[i].children[j].className = blockDictionary[td][0];
-            console.log(table.children[i].children[j]);
         });
     });
 }
 function blockGenerator(){
+    stopDown = false;
   var block = blockArr[Math.floor(Math.random() * 7)][2];
   console.log(block);
   block.forEach(function (tr, i){
       tr.forEach(function (td, j){
           //TODO: if block stacked full then game end
           tetrisData[i][j + 3] = td;
-          console.log(tetrisData[i][j+3]);
       });
     });
   drawScreen();
 }
 
-// function blockDown(){
-//     for(var i = tetrisData.length - 1; i >= 0; i--){
-//         tetrisData[i].forEach(function(td, j){
-//             if ( td > 0 && td < 10){
-//                 if(tetrisData[i+1] && !stopDown){
-//                     tetrisData[i + 1][j] = td;
-//                     tetrisData[i][j] = 0;
-//                 } else{
-//                     stopDown = true;
-//                     tetrisData[i][j] = td * 10;
-//                 }
-//             }
-//         });
-//     }
-//     drawScreen();
-// }
+function blockDown(){
+    for(var i = tetrisData.length - 1; i >= 0; i--){
+        tetrisData[i].forEach(function(td, j){
+            if ( td > 0 && td < 10){
+                if(tetrisData[i+1] && !stopDown){
+                    tetrisData[i + 1][j] = td;
+                    console.log(td);
+                    tetrisData[i][j] = 0;
+                } else{// if block touches end
+                    stopDown = true;
+                    tetrisData[i][j] = td * 10;
+                }
+            }
+        });
+    }
+    if (stopDown){
+        blockGenerator();
+    }
+    drawScreen();
+}
 
 window.addEventListener('keyup', function(e){
     switch(e.code){
@@ -147,4 +151,4 @@ window.addEventListener('keyup', function(e){
 
 tableSetting();
 blockGenerator();
-// setInterval(blockDown, 100);
+setInterval(blockDown, 100);
