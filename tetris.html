@@ -6,8 +6,20 @@
     <style>
         #table{
             border-collapse: collapse;
+            display: inline-block;
+            margin-right: 20px;
         }
         #table td{
+            border: 1px solid black;
+            width: 20px;
+            height: 20px;
+        }
+        #next-table {
+            border-collapse: collapse;
+            display: inline-block;
+            position: absolute;
+        }
+        #next-table tr td {
             border: 1px solid black;
             width: 20px;
             height: 20px;
@@ -39,9 +51,24 @@
     </style>
 </head>
 <body>
-<table id="table">
-
+<table id="table"></table>
+<table id="next-table">
+    <tr>
+        <td></td><td></td><td></td><td></td>
+    </tr>
+    <tr>
+        <td></td><td></td><td></td><td></td>
+    </tr>
+    <tr>
+        <td></td><td></td><td></td><td></td>
+    </tr>
+    <tr>
+        <td></td><td></td><td></td><td></td>
+    </tr>
 </table>
+<button id="pause">Pause</button>
+<button id="start">start</button>
+<button id="mute">mute</button>
 <script src ='tetris.js'></script>
 </body>
 </html>
