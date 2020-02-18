@@ -260,8 +260,7 @@ function draw(){
     tetrisData.forEach((col, i ) => {
         col.forEach((row,j) => {
             if(row > 0) {
-                table.children[i].children[j].className = colors[tetrisData[i][j] - 1];
-                console.log(colors[tetrisData[i][j] - 1]);
+                table.children[i].children[j].className = tetrisData[i][j] >= 10 ? colors[tetrisData[i][j]/10-1] : colors[tetrisData[i][j] - 1];
             }else {
                 table.children[i].children[j].className = '';
             }
@@ -301,41 +300,80 @@ function generate() {
     if(isGameOver){
         clearInterval(int);
         draw();
-        alert('game over');
+        // alert('gameover');
     }else {
         draw();
     }
 
 tick();
 }
-
+function checkRows() { //if a row is full then delete the row and push new row to tetris.
+    const fullRows = [];
+    tetrisData.forEach((col,i) => {
+        let count = 0;
+        col.forEach((row,j) => {
+            if(row > 0){
+                count++
+            }
+        });
+        if(count === 10) {
+            fullRows.push(i);
+        }
+    });
+    const countfullRows = fullRows.length;
+    tetrisData = tetrisData.filter((row,i) => !fullRows.includes(i));
+    for(let i = 0; i < countfullRows; i++){
+        tetrisData.unshift([...Array(10)].fill(0));
+    }
+}
 function tick() {
     const nextTopLeft= [currentTopLeft[0] + 1, currentTopLeft[1]];
     const activeBlocks = [];
     let canGoDown = true;
     let currentBlockShape = currentBlock.shape[0];
     for(let i = currentTopLeft[0]; i < currentTopLeft[0] + currentBlockShape.length; i++){
-       // console.log(currentTopLeft[0]);
         if(i < 0 || i >= 20 ) continue;
         for(let j = currentTopLeft[1]; j < currentTopLeft[1] + currentBlockShape.length; j++){
-            //console.log(i,j);
-            console.log(tetrisData[i], tetrisData[i+1],  tetrisData[i][j]);
-            console.log(isInvalidBlock(tetrisData[i]));
-            console.log(isActiveBlock(tetrisData[i][j]));
-
+            if(isActiveBlock(tetrisData[i][j])){
+                activeBlocks.push([i,j]);
+                if(isInvalidBlock(tetrisData[i + 1] && tetrisData[i+1][j])){
+                    canGoDown = false;
+                }
+            }
         }
     }
-    //console.log(currentBlockShape, currentBlockShape.length, currentTopLeft[0]);
+    if(!canGoDown){
+        activeBlocks.forEach((blocks) => {
+           tetrisData[blocks[0]][blocks[1]] *= 10;
+        });
+        checkRows();
+        generate();
+        return false;
+     }else if (canGoDown) {
+        for(let i = tetrisData.length - 1; i >=0; i--){
+            const col =tetrisData[i];
+            col.forEach((row,j) => {
+                if (row < 10 && tetrisData[i+1] && tetrisData[i+1][j] < 10) {
+                    tetrisData[i+1][j] = row;
+                    tetrisData[i][j] = 0;
+                }
+            });
+        }
+    }
+    currentTopLeft = nextTopLeft;
+    draw();
+    return true;
 }
 
 window.addEventListener('keydown', function(e){
     switch(e.code){
         case 'ArrowRight': // move to right
+            console.log(currentTopLeft[0]);
             break;
         case 'ArrowLeft': //move to left
             break;
         case 'ArrowDown': // move down
-            break;
+            tick();
         default:
             break;
     }
@@ -354,6 +392,8 @@ window.addEventListener('keyup', function(e){
     }
 });
 
+
 tableSetting();
 generate();
+let int = setInterval(tick,2000);
 // setInterval(blockDown, 100);
