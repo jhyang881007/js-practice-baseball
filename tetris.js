@@ -225,7 +225,8 @@ var blocks = [
 ];
 
 const colors = ['red', 'blue', 'orange', 'skyblue', 'yellowgreen','pink', 'yellow'];
-var stopDown = false;
+const isActiveBlock = value => (value > 0 && value < 10);
+const isInvalidBlock = value => (value === undefined || value >= 10);
 
 function tableSetting(){
     const fragment = document.createDocumentFragment();
@@ -246,13 +247,26 @@ function drawNextBlock() { //generate a tetris block
     const nextTable = document.getElementById('next-table');
     nextTable.querySelectorAll('tr').forEach((col,i) => {
         Array.from(col.children).forEach((row, j) => {
-           if(nextBlock.shape[0][i][j] > 0){
-               nextTable.querySelectorAll('td').className = colors[nextBlock.numCode - 1];
+           if(nextBlock.shape[0][i] && nextBlock.shape[0][i][j] > 0){
+               nextTable.querySelectorAll('tr')[i].children[j].className = colors[nextBlock.numCode - 1];
            }else{
-               nextTable.querySelectorAll('td').className = 'white';
+               nextTable.querySelectorAll('tr')[i].children[j].className = 'white';
            }
         });
 });
+}
+
+function draw(){
+    tetrisData.forEach((col, i ) => {
+        col.forEach((row,j) => {
+            if(row > 0) {
+                table.children[i].children[j].className = colors[tetrisData[i][j] - 1];
+                console.log(colors[tetrisData[i][j] - 1]);
+            }else {
+                table.children[i].children[j].className = '';
+            }
+        });
+    });
 }
 
 function generate() {
@@ -266,6 +280,8 @@ function generate() {
     drawNextBlock();
     currentTopLeft = [-1,3];
     let isGameOver = false;
+
+    /*make decision if game is over or not*/
     currentBlock.shape[0].slice(1).forEach((col,i) => {
         col.forEach((row,j)=>{
             if(row && tetrisData[i][j+3]){
@@ -274,6 +290,7 @@ function generate() {
         });
     });
 
+    /*generate block data*/
     currentBlock.shape[0].slice(1).forEach((col,i) => {
         col.forEach((row,j)=>{
             if(row){
@@ -281,10 +298,35 @@ function generate() {
             }
         });
     });
+    if(isGameOver){
+        clearInterval(int);
+        draw();
+        alert('game over');
+    }else {
+        draw();
+    }
 
-
+tick();
 }
 
+function tick() {
+    const nextTopLeft= [currentTopLeft[0] + 1, currentTopLeft[1]];
+    const activeBlocks = [];
+    let canGoDown = true;
+    let currentBlockShape = currentBlock.shape[0];
+    for(let i = currentTopLeft[0]; i < currentTopLeft[0] + currentBlockShape.length; i++){
+       // console.log(currentTopLeft[0]);
+        if(i < 0 || i >= 20 ) continue;
+        for(let j = currentTopLeft[1]; j < currentTopLeft[1] + currentBlockShape.length; j++){
+            //console.log(i,j);
+            console.log(tetrisData[i], tetrisData[i+1],  tetrisData[i][j]);
+            console.log(isInvalidBlock(tetrisData[i]));
+            console.log(isActiveBlock(tetrisData[i][j]));
+
+        }
+    }
+    //console.log(currentBlockShape, currentBlockShape.length, currentTopLeft[0]);
+}
 
 window.addEventListener('keydown', function(e){
     switch(e.code){
@@ -313,5 +355,5 @@ window.addEventListener('keyup', function(e){
 });
 
 tableSetting();
-
+generate();
 // setInterval(blockDown, 100);
